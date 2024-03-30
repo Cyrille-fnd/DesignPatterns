@@ -1,5 +1,9 @@
 <?php
 
+namespace src\Singleton;
+
+use DateTime;
+
 class Singleton
 {
     private static Singleton $instance;

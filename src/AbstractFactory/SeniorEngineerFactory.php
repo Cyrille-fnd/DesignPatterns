@@ -2,15 +2,15 @@
 
 namespace src\AbstractFactory;
 
-class MechanicEngineerFactory implements EngineerFactoryInterface
+class SeniorEngineerFactory implements EngineerFactoryInterface
 {
     public function hireMechanicEngineer(): MechanicEngineerInterface
     {
-        return new MechanicMechanicEngineer();
+        return new SeniorMechanicEngineer();
     }
 
-    public function hireSeniorEngineer(): SoftwareEngineerInterface
+    public function hireSoftwareEngineer(): SoftwareEngineerInterface
     {
-        return new SoftwareMechanicEngineer();
+        return new SeniorSoftwareEngineer();
     }
 }

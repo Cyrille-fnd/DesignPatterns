@@ -1,8 +1,8 @@
 <?php
 
-//require('src/Singleton/Singleton.php');
-
-
+use src\AbstractFactory\EngineerFactoryInterface;
+use src\AbstractFactory\JuniorEngineerFactory;
+use src\AbstractFactory\SeniorEngineerFactory;
 use src\Factory\MechanicEngineerFactory;
 use src\Factory\SoftwareEngineerFactory;
 use src\Singleton\Singleton;
@@ -46,3 +46,31 @@ if ($randomInt === 0) {
 }
 
 $engineerFactory->letEngineerAloneSoStuffCanBeDone();
+echo '<br><br><br>';
+
+echo 'Design pattern abstract Factory';
+echo '<br>';
+
+class Application
+{
+    private EngineerFactoryInterface $engineerFactory;
+
+    public function __construct(EngineerFactoryInterface $engineerFactory)
+    {
+        $this->engineerFactory = $engineerFactory;
+    }
+
+    public function launch() {
+        $engineer = $this->engineerFactory->hireSoftwareEngineer();
+        $engineer->doSoftwareEngineerStuff();
+    }
+}
+
+if ($randomInt === 0) {
+    $engineerFactory = new JuniorEngineerFactory();
+} else {
+    $engineerFactory = new SeniorEngineerFactory();
+}
+
+$app = new Application($engineerFactory);
+$app->launch();

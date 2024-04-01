@@ -2,7 +2,7 @@
 
 namespace src\AbstractFactory;
 
-interface JuniorEngineerInterface
+interface MechanicEngineerInterface
 {
-    public function doEngineerStuff(): void;
+    public function doMechanicEngineerStuff(): void;
 }

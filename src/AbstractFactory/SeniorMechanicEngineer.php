@@ -4,10 +4,10 @@ namespace src\AbstractFactory;
 
 use src\AbstractFactory\SoftwareEngineerInterface;
 
-class SoftwareMechanicEngineer implements SoftwareEngineerInterface
+class SeniorMechanicEngineer implements MechanicEngineerInterface
 {
 
-    public function doEngineerStuff(): void
+    public function doMechanicEngineerStuff(): void
     {
         echo 'doing some senior mechanic engineer stuff';
     }

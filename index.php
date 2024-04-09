@@ -7,9 +7,14 @@ use src\Adapter\EngineerHiringPlatformAdapter;
 use src\Adapter\EngineerHiringPlatformInterface;
 use src\Adapter\InternalHiringProcess;
 use src\Adapter\SomeExternalHiringProcess;
+use src\ChainOfResponsibility\HRInterviewHandler;
+use src\ChainOfResponsibility\SoftwareEngineer;
+use src\ChainOfResponsibility\TechLeadInterviewHandler;
+use src\ChainOfResponsibility\TechnicalTeamInterviewHandler;
 use src\Factory\MechanicEngineerFactory;
 use src\Factory\SoftwareEngineerFactory;
 use src\Singleton\Singleton;
+use src\ChainOfResponsibility\EngineerInterface;
 
 spl_autoload_extensions(".php"); // comma-separated list
 spl_autoload_register();
@@ -112,3 +117,53 @@ class AdapterApplication
 $internalHiringProcess = new EngineerHiringPlatformAdapter(new SomeExternalHiringProcess());
 $adapterApp = new AdapterApplication($internalHiringProcess);
 $adapterApp->startHiringProcess();
+
+class ChainOfResponsibilityApplication
+{
+    private EngineerInterface $candidate;
+
+    private TechLeadInterviewHandler $firstStepHiringProcessHandler;
+
+    private HRInterviewHandler $secondStepHiringProcessHandler;
+
+    private TechnicalTeamInterviewHandler $thirdStepHiringProcessHandler;
+
+    public function __construct(
+        EngineerInterface $candidate,
+        TechLeadInterviewHandler $firstStepHiringProcessHandler,
+        HRInterviewHandler $secondStepHiringProcessHandler,
+        TechnicalTeamInterviewHandler $thirdStepHiringProcessHandler
+    ) {
+        $this->candidate = $candidate;
+        $this->firstStepHiringProcessHandler = $firstStepHiringProcessHandler;
+        $this->secondStepHiringProcessHandler = $secondStepHiringProcessHandler;
+        $this->thirdStepHiringProcessHandler = $thirdStepHiringProcessHandler;
+    }
+
+    public function setupHiringProcess(): void
+    {
+        $this->firstStepHiringProcessHandler->setNextHandler($this->secondStepHiringProcessHandler);
+        $this->secondStepHiringProcessHandler->setNextHandler($this->thirdStepHiringProcessHandler);
+    }
+
+    public function startHiringProcess(): void
+    {
+        $this->firstStepHiringProcessHandler->checkCandidate($this->candidate);
+    }
+}
+
+$candidate = new SoftwareEngineer(
+    rand(0,10),
+    rand(0,10),
+    rand(0,10)
+);
+
+$app = new ChainOfResponsibilityApplication(
+    $candidate,
+    new TechLeadInterviewHandler(),
+    new HRInterviewHandler(),
+    new TechnicalTeamInterviewHandler()
+);
+
+$app->setupHiringProcess();
+$app->startHiringProcess();

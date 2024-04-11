@@ -13,6 +13,12 @@ use src\ChainOfResponsibility\TechLeadInterviewHandler;
 use src\ChainOfResponsibility\TechnicalTeamInterviewHandler;
 use src\Factory\MechanicEngineerFactory;
 use src\Factory\SoftwareEngineerFactory;
+use src\Observer\CandidateSubscriberInterface;
+use src\Observer\HRDepartment;
+use src\Observer\HRPublisherInterface;
+use src\Observer\JobOfferPublisher;
+use src\Observer\ProductOwnerCandidate;
+use src\Observer\SoftwareEngineerCandidate;
 use src\Singleton\Singleton;
 use src\ChainOfResponsibility\EngineerInterface;
 
@@ -114,56 +120,49 @@ class AdapterApplication
     }
 }
 
-$internalHiringProcess = new EngineerHiringPlatformAdapter(new SomeExternalHiringProcess());
-$adapterApp = new AdapterApplication($internalHiringProcess);
-$adapterApp->startHiringProcess();
+echo 'Design pattern Observer <br />';
 
-class ChainOfResponsibilityApplication
+class ObserverApplication
 {
-    private EngineerInterface $candidate;
+    private HRDepartment $HRDepartment;
 
-    private TechLeadInterviewHandler $firstStepHiringProcessHandler;
-
-    private HRInterviewHandler $secondStepHiringProcessHandler;
-
-    private TechnicalTeamInterviewHandler $thirdStepHiringProcessHandler;
+    /**
+     * @var CandidateSubscriberInterface[]
+     */
+    private array $candidates = [];
+    private HRPublisherInterface $publisher;
 
     public function __construct(
-        EngineerInterface $candidate,
-        TechLeadInterviewHandler $firstStepHiringProcessHandler,
-        HRInterviewHandler $secondStepHiringProcessHandler,
-        TechnicalTeamInterviewHandler $thirdStepHiringProcessHandler
+        HRPublisherInterface $publisher
     ) {
-        $this->candidate = $candidate;
-        $this->firstStepHiringProcessHandler = $firstStepHiringProcessHandler;
-        $this->secondStepHiringProcessHandler = $secondStepHiringProcessHandler;
-        $this->thirdStepHiringProcessHandler = $thirdStepHiringProcessHandler;
+        $this->publisher = $publisher;
+        $this->HRDepartment = new HRDepartment($publisher);
     }
 
-    public function setupHiringProcess(): void
+    public function addCandidate(CandidateSubscriberInterface $subscriber)
     {
-        $this->firstStepHiringProcessHandler->setNextHandler($this->secondStepHiringProcessHandler);
-        $this->secondStepHiringProcessHandler->setNextHandler($this->thirdStepHiringProcessHandler);
+        $this->candidates[] = $subscriber;
     }
 
-    public function startHiringProcess(): void
+    public function setup()
     {
-        $this->firstStepHiringProcessHandler->checkCandidate($this->candidate);
+        foreach ($this->candidates as $candidate) {
+            $this->publisher->addSubscriber($candidate);
+        }
+    }
+
+    public function start()
+    {
+        $this->HRDepartment->createJob();
     }
 }
 
-$candidate = new SoftwareEngineer(
-    rand(0,10),
-    rand(0,10),
-    rand(0,10)
-);
+$observerApp = new ObserverApplication(new JobOfferPublisher());
 
-$app = new ChainOfResponsibilityApplication(
-    $candidate,
-    new TechLeadInterviewHandler(),
-    new HRInterviewHandler(),
-    new TechnicalTeamInterviewHandler()
-);
+$productCandidate = new ProductOwnerCandidate();
+$engineerCandidate = new SoftwareEngineerCandidate();
+$observerApp->addCandidate($productCandidate);
+$observerApp->addCandidate($engineerCandidate);
 
-$app->setupHiringProcess();
-$app->startHiringProcess();
+$observerApp->setup();
+$observerApp->start();
